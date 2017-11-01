@@ -23,26 +23,29 @@ public class SimpleNode implements Observer{
     ArrayList<Integer> iterationTimeArray = new ArrayList<>();
     private int previousTime = 0;   // time took processing (current - 1) iterations
 
-    private int stalenessBound = MLsettings.OVERALL_STALENESS_BOUND;
-
     /* variables which changes through time */
     private int currentIteration = 0;
 
-    public SimpleNode() {    }
+    private double waitTime; // when the node is bounded, this var records waiting time.
+
+    public double getWaitTime() {
+        return waitTime;
+    }
 
     public SimpleNode(SimpleMLsystem observable, int nodeNum) {
         this.system = observable;
         this.nodeNum = nodeNum;
         observable.addObserver(this);
-        //updateComponents();
         initIterationTimeArray();
+    }
+
+    public int getNum() {
+        return nodeNum;
     }
 
     public void initSimpleNode() {
         currentIteration = 0;
         previousTime = 0;
-        initIterationTimeArray();
-        rand = new Random();
     }
     /**
      * change all conditions of ML according to the normal distribution
@@ -55,14 +58,41 @@ public class SimpleNode implements Observer{
         
     }
 
+    /**
+     * generate the data for costs of iterations of this Node
+     * Set Hostile_flag ON to make means fluctuate throughout the ML
+     * Set Failure_flag ON to make some of the nodes fail(very slow)
+     */
     private void initIterationTimeArray() {
-        int iterationTime;
-        for(int i=0; i < MLsettings.TOTAL_ITERATION; i++) {
-            //pick iteration time from gaussian dist. until it is larger than minimum iteration time
-            //do {
-                iterationTime = (int) (rand.nextGaussian() * TIME_DEVIATION_BY_NODES + LEARNING_MEAN_TIME);
-            //} while(iterationTime < MLsettings.MINIMUM_ITERATION_TIME);
-            iterationTimeArray.add(iterationTime);
+        int iterationTime = 0;
+        waitTime = 0;
+        if(!system.isPreset()) {
+            for (int i = 0; i < system.getmLsettings().getIterNum(); i++) {
+                // Node Fluctuation : Making Hostile Environment
+                if (system.isHostile() && system.getHostileUpdate().contains(i)) {
+                    system.getmLsettings().setDevTime(system.getRandomMeans().get(system.getHostileUpdate().indexOf(i)));
+                }
+                do {
+                    if (!system.isFailure()) {   // non-failure, non-hostile mode
+                        iterationTime = (int) (rand.nextGaussian() * (double) system.getmLsettings().getDevTime() +
+                                system.getmLsettings().getMeanTime());
+                    } else {    // failure mode
+                        if (this.nodeNum % 20 == 0 && i < 1000 && 300 < i) {// every 30 nodes
+                            iterationTime = 400;     // very slow
+                        } else {
+                            iterationTime = (int) (rand.nextGaussian() * (double) system.getmLsettings().getDevTime() +
+                                    system.getmLsettings().getMeanTime());
+                        }
+                    }
+                } while (iterationTime < 10);
+                iterationTimeArray.add(iterationTime);
+            }
+        }
+        else {  // preset mode
+            for (int i = 0; i < system.getmLsettings().getIterNum(); i++) {
+                iterationTimeArray.add((int)(rand.nextGaussian() * (double) system.getPresetDev(i) +
+                                        system.getmLsettings().getMeanTime()));
+            }
         }
     }
 
@@ -91,15 +121,16 @@ public class SimpleNode implements Observer{
      * this (Iteration) is (iterationTime) timeSteps
      */
     public void doTimeStep() {
-        if (currentIteration < MLsettings.TOTAL_ITERATION) {
+        if (currentIteration < system.getmLsettings().getIterNum()) {
             //if bounded
-            if (currentIteration > system.getSlowestIteration() + MLsettings.OVERALL_STALENESS_BOUND) {
-//                System.out.printf("iter : " +currentIteration +"/ " + this + " is bounded\n");
+            if (currentIteration > system.getSlowestIteration() + system.getmLsettings().getStaleness()) {
                 previousTime = system.getClock();   // the iteration does not start so time took for current - 1 iteration is now
+                // previousTime : time took for (current - 1)th iteration
+                waitTime+=0.00001;
             } else if (system.getClock() - previousTime >= iterationTimeArray.get(currentIteration)) {
+                system.notifyTime(this, iterationTimeArray.get(currentIteration));
                 newIteration();
             }
-
         }
     }
     @Override

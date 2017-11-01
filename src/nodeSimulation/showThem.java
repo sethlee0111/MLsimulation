@@ -106,7 +106,7 @@ public class showThem implements EventHandler<ActionEvent> {
 
         ArrayList<XYChart.Series> seriesArrayList = new ArrayList<>();
         ArrayList<XYChart.Series> dragArrayList = new ArrayList<>();
-        ArrayList<ArrayList<Integer>> dragArrArr = new ArrayList<>();
+        ArrayList<ArrayList<Double>> dragArrArr = new ArrayList<>();
         //arraylist of arraylist which stores drag index of specific series
         ArrayList<ArrayList<Integer>> staleGoodnessArrArr = new ArrayList<>();
         //arraylist of arraylist which stores staleGoodness of specific series
@@ -118,14 +118,14 @@ public class showThem implements EventHandler<ActionEvent> {
                 XYChart.Series seriesStaleness = new XYChart.Series();
                 XYChart.Series seriesDrag = new XYChart.Series();
                 seriesStaleness.setName(mLsettings.getSeriesMode() + " " + varNum);   // set name for series Mode
-                seriesDrag.setName("Drag Index of " + mLsettings.getSeriesMode() + " " + varNum);   // set name for graph for Draㅎ
+                seriesDrag.setName("Drag Index of " + mLsettings.getSeriesMode() + " " + varNum);   // set name for graph for Drawing
                 for (int i = mLsettings.getMinMode(); i <= mLsettings.getMaxMode(); i++) {
                     seriesStaleness.getData().add(new XYChart.Data(i, 0));
                     seriesDrag.getData().add(new XYChart.Data(i, 0));
                     staleGoodnessArrArr.add(new ArrayList<Integer>());
                     staleGoodnessArrArr.get(j).add(0);
-                    dragArrArr.add(new ArrayList<Integer>());
-                    dragArrArr.get(j).add(0);
+                    dragArrArr.add(new ArrayList<Double>());
+                    dragArrArr.get(j).add(new Double(0));
                     dispArrList.add("0 ");
                 }
 //                seriesArrayList.add(seriesStaleness);

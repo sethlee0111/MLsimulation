@@ -1,5 +1,8 @@
 package nodeSimulation;
 
+import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.analysis.integration.SimpsonIntegrator;
+import org.apache.commons.math3.distribution.CauchyDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
 import static java.lang.Math.exp;
@@ -8,15 +11,19 @@ import static java.lang.Math.sqrt;
 /**
  * Created by sethlee on 8/9/17.
  */
-public class RatioDist implements Integratable{
+public class RatioDist implements UnivariateFunction{
     private double m;   // mean mu
     private double r;   // deviation
     //constants used for integrating pdf.
-    final private double INFINITY = 70; //  -INFINITY is sufficient to get meaningful val.
-    final private double SLICE_WIDTH = 0.01;   // width of a rectangle when integrating
+    final private double INFINITY = 100; //  -INFINITY is sufficient to get meaningful val.
+    final private double SLICE_WIDTH = 0.1;   // width of a rectangle when integrating
 
     public RatioDist(double m, double r) {
         this.m = m;
+        this.r = r;
+    }
+
+    public void setR(double r) {
         this.r = r;
     }
 
@@ -27,7 +34,7 @@ public class RatioDist implements Integratable{
      * Gaussian distribution with zero mean is the cauchy distribution
      * also verified by getting P(z < 1) = 0.5
      */
-    public double run(double z) {
+    public double value(double z) {
         double res;
 
         NormalDistribution normalDistribution = new NormalDistribution();
@@ -48,7 +55,8 @@ public class RatioDist implements Integratable{
      */
     public double probLowerThan(double x) {
         RatioDist ratioDist = new RatioDist(m, r);
-        return SethIntegration.integrate(ratioDist, -INFINITY, x, SLICE_WIDTH);
+        SimpsonIntegrator simpsonIntegrator = new SimpsonIntegrator();
+        return simpsonIntegrator.integrate(10000000, ratioDist, -INFINITY, x);
     }
 
     /**
@@ -58,7 +66,8 @@ public class RatioDist implements Integratable{
      */
     public double probGreaterThan(double x) {
         RatioDist ratioDist = new RatioDist(m, r);
-        return SethIntegration.integrate(ratioDist, x, INFINITY, SLICE_WIDTH);
+        SimpsonIntegrator simpsonIntegrator = new SimpsonIntegrator();
+        return simpsonIntegrator.integrate(10000000, ratioDist, x, INFINITY);
     }
 
     /**
@@ -67,7 +76,7 @@ public class RatioDist implements Integratable{
      */
     public double a(double z) {
         double z_2 = Math.pow(z, 2);
-        return sqrt((z_2 + 1) * (1 / (r * r)));
+        return sqrt(z_2 + 1) * (1 / r);
     }
 
     /**
@@ -75,7 +84,7 @@ public class RatioDist implements Integratable{
      * @param z
      */
     public double b(double z) {
-        return m / (r * r) * (z + 1);
+        return (m / (r * r)) * (z + 1);
     }
 
     /**
@@ -97,8 +106,21 @@ public class RatioDist implements Integratable{
 
 
     public static void main(String[] args) {
-        RatioDist ratioDist = new RatioDist(10, 1);
-        System.out.printf("result : " + ratioDist.probLowerThan(0.5));
-//        System.out.printf("" + ratioDist.run(1));
+        RatioDist ratioDist = new RatioDist(0, 1);
+        CauchyDistribution cauchyDistribution = new CauchyDistribution();
+        double m;
+        for(double s=1; s < 20; s++) {
+            m = 1/s;
+//            System.out.println("m : " + m);
+            System.out.println("Rresult : " + ratioDist.probLowerThan(m));
+//            System.out.println("Cresult : " + cauchyDistribution.cumulativeProbability(m));
+//            System.out.println("================================================");
+
+        }
+//        double diff = ratioDist.probLowerThan(0.142) - ratioDist.probLowerThan(0.115);
+//        System.out.println("diff: " + diff);
+////        System.out.printf("" + ratioDist.run(1));
+//        CauchyDistribution cauchyDistribution = new CauchyDistribution();
+//        System.out.println(": " + (cauchyDistribution.cumulativeProbability(0.142) - cauchyDistribution.cumulativeProbability(0.125)));
     }
 }

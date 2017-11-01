@@ -10,9 +10,9 @@ public class MLsettings {
     public static final int LOCATION_MAX_Y = 100;
 
     public static int LEARNING_MEAN_TIME = 100; // mean time for ML for overall nodes. follows Gaussian when applied
-    public static int NUMBER_OF_NODES = 4;
+    public static int NUMBER_OF_NODES = 50;
     public static int TIME_DEVIATION_BY_NODES = 20;
-    public static int TOTAL_ITERATION = 30;
+    public static int TOTAL_ITERATION = 50;
     public static int MINIMUM_ITERATION_TIME = 5;
 
     /* constants for simple SSP Simulation */
@@ -25,15 +25,45 @@ public class MLsettings {
     private int minIter;
     private int staleness;
 
+    private int sampleWindow;   // the number of recent iterations which will be sampled to obtain optimal staleness
+    private ArrayList<Integer> gaussUpdateFreq = new ArrayList<>();
+
     private String xMode;    // x Axis of a graph
     private int minMode;
     private int maxMode;
 
+    private ArrayList<Integer> dynamicList = new ArrayList<>();
+
     //of different series
     private int seriesNum;  // number of different Graphs
+
+    public int getSampleWindow() {
+        return sampleWindow;
+    }
+
+    public void setSampleWindow(int sampleWindow) {
+        this.sampleWindow = sampleWindow;
+    }
+
+    public ArrayList<Integer> getGaussUpdateFreq() {
+        return gaussUpdateFreq;
+    }
+
+    public void setGaussUpdateFreq(ArrayList<Integer> gaussUpdateFreq) {
+        this.gaussUpdateFreq = gaussUpdateFreq;
+    }
+
     private String seriesMode;
     private ArrayList<Integer> seriesArrayList;
 //    private int seriesSet = 0;
+
+    public ArrayList<Integer> getDynamicList() {
+        return dynamicList;
+    }
+
+    public void setDynamicList(ArrayList<Integer> dynamicList) {
+        this.dynamicList = dynamicList;
+    }
 
     public MLsettings() {
         // Initial Settings
@@ -46,7 +76,7 @@ public class MLsettings {
 
         xMode = "Staleness";
         minMode = 0;
-        maxMode = TOTAL_ITERATION / 10;
+        maxMode = 10;
 
         seriesMode = "Dev T";
         seriesNum = 1;
@@ -86,28 +116,29 @@ public class MLsettings {
     }
 
     public void setStaleness(int staleness) {
-        this.staleness = staleness;
+        if(staleness >= 0)
+            this.staleness = staleness;
     }
 
     public int getSeriesNum() {
         return seriesNum;
     }
 
-    public MLsettings setSeriesNum(int seriesNum) {
+    MLsettings setSeriesNum(int seriesNum) {
         this.seriesNum = seriesNum;
         return this;
     }
 
-    public String getSeriesMode() {
+    String getSeriesMode() {
         return seriesMode;
     }
 
-    public MLsettings setSeriesMode(String seriesMode) {
+    MLsettings setSeriesMode(String seriesMode) {
         this.seriesMode = seriesMode;
         return this;
     }
 
-    public ArrayList<Integer> getSeriesArrayList() {
+    ArrayList<Integer> getSeriesArrayList() {
         return seriesArrayList;
     }
 
@@ -116,20 +147,20 @@ public class MLsettings {
         return this;
     }
 
-    public int getMeanTime() {
+    int getMeanTime() {
         return meanTime;
     }
 
-    public MLsettings setMeanTime(int meanTime) {
+    MLsettings setMeanTime(int meanTime) {
         this.meanTime = meanTime;
         return this;
     }
 
-    public int getNodeNum() {
+    int getNodeNum() {
         return nodeNum;
     }
 
-    public MLsettings setNodeNum(int nodeNum) {
+    MLsettings setNodeNum(int nodeNum) {
         this.nodeNum = nodeNum;
         return this;
     }

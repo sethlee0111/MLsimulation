@@ -6,8 +6,18 @@ package nodeSimulation;
 public class SimulationResult {
     private int syncTime;
     private int staleGoodness;
-    private int dragDiff;
+    private double dragDiff;
     private int staleWait;
+
+    private int staleTime;
+
+    public int getStaleTime() {
+        return staleTime;
+    }
+
+    public void setStaleTime(int staleTime) {
+        this.staleTime = staleTime;
+    }
 
     public int getStaleWait() {
         return staleWait;
@@ -33,7 +43,7 @@ public class SimulationResult {
         this.staleGoodness = staleGoodness;
     }
 
-    public int getDragDiff() {
+    public double getDragDiff() {
         return dragDiff;
     }
 
