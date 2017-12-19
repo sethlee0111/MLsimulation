@@ -14,7 +14,7 @@ The advent and proliferation of the Internet of Things calls for a paradigm shif
   - Draws a graph comparing the cost by different staleness levels
 
 ### Paper
-"Dynamically Adjusting the Stale Synchronous Parallel Model in Edge Computing" have been submitted to [IPDPS 2018](www.ipdps.org) and awaiting acceptance. :sparkles
+"Dynamically Adjusting the Stale Synchronous Parallel Model in Edge Computing" have been submitted to [MobiHoc 2018](www.sigmobile.org) and awaiting acceptance. :sparkles
 
 ### Requirements
 Apache Commons Math Library 3.6.1 or higher is required to compile the codes.
